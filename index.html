@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,37 +7,117 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ── Theme variables ────────────────────────────────────────── */
+    :root[data-theme="light"] {
+      --bg:           #fff0f5;
+      --card-bg:      #ffffff;
+      --card-border:  #f9a8d4;
+      --card-shadow:  rgba(236, 72, 153, 0.12);
+      --text:         #1e1b2e;
+      --subtitle:     #9d6c85;
+      --stat-bg:      #fff5f8;
+      --stat-border:  #fce7f3;
+      --stat-label:   #b0729a;
+      --stat-value:   #db2777;
+      --stat-unit:    #c084a8;
+      --h1:           #831843;
+      --badge-bg:     #fce7f3;
+      --badge-color:  #be185d;
+      --err-bg:       #fff1f5;
+      --err-border:   #fda4af;
+      --err-color:    #be123c;
+      --code-bg:      #fce7f3;
+      --code-color:   #9d174d;
+      --toggle-bg:    #f9a8d4;
+      --toggle-hover: #f472b6;
+      --toggle-icon:  #831843;
+    }
+
+    :root[data-theme="dark"] {
+      --bg:           #0f172a;
+      --card-bg:      #1e293b;
+      --card-border:  #334155;
+      --card-shadow:  rgba(0, 0, 0, 0.4);
+      --text:         #e2e8f0;
+      --subtitle:     #64748b;
+      --stat-bg:      #0f172a;
+      --stat-border:  #334155;
+      --stat-label:   #64748b;
+      --stat-value:   #38bdf8;
+      --stat-unit:    #475569;
+      --h1:           #f8fafc;
+      --badge-bg:     #166534;
+      --badge-color:  #4ade80;
+      --err-bg:       #1e1e2e;
+      --err-border:   #7f1d1d;
+      --err-color:    #f87171;
+      --code-bg:      #0f172a;
+      --code-color:   #94a3b8;
+      --toggle-bg:    #334155;
+      --toggle-hover: #475569;
+      --toggle-icon:  #e2e8f0;
+    }
+
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 2rem;
+      transition: background 0.3s, color 0.3s;
     }
 
     .card {
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 1.5rem;
       padding: 2.5rem 3rem;
       max-width: 680px;
       width: 100%;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+      box-shadow: 0 25px 60px var(--card-shadow);
+      position: relative;
+      z-index: 1;
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+
+    /* ── Toggle button ──────────────────────────────────────────── */
+    #theme-toggle {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      background: var(--toggle-bg);
+      color: var(--toggle-icon);
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.2s;
+      line-height: 1;
+    }
+    #theme-toggle:hover {
+      background: var(--toggle-hover);
+      transform: scale(1.1);
     }
 
     h1 {
       font-size: 1.6rem;
       font-weight: 700;
-      color: #f8fafc;
+      color: var(--h1);
       margin-bottom: 0.25rem;
+      padding-right: 2.5rem; /* avoid overlap with toggle */
     }
 
     .subtitle {
-      color: #64748b;
+      color: var(--subtitle);
       font-size: 0.9rem;
       margin-bottom: 2rem;
     }
@@ -49,38 +129,39 @@
     }
 
     .stat {
-      background: #0f172a;
-      border: 1px solid #334155;
+      background: var(--stat-bg);
+      border: 1px solid var(--stat-border);
       border-radius: 1rem;
       padding: 1.25rem 1.5rem;
       display: flex;
       flex-direction: column;
       gap: 0.3rem;
+      transition: background 0.3s, border-color 0.3s;
     }
 
     .stat-label {
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: #64748b;
+      color: var(--stat-label);
     }
 
     .stat-value {
       font-size: 2rem;
       font-weight: 700;
-      color: #38bdf8;
+      color: var(--stat-value);
       line-height: 1;
     }
 
     .stat-unit {
       font-size: 0.8rem;
-      color: #475569;
+      color: var(--stat-unit);
     }
 
     .error {
-      color: #f87171;
-      background: #1e1e2e;
-      border: 1px solid #7f1d1d;
+      color: var(--err-color);
+      background: var(--err-bg);
+      border: 1px solid var(--err-border);
       border-radius: 0.75rem;
       padding: 1rem 1.5rem;
       font-size: 0.95rem;
@@ -89,21 +170,21 @@
     .example {
       margin-top: 1rem;
       font-size: 0.8rem;
-      color: #64748b;
+      color: var(--subtitle);
       word-break: break-all;
     }
 
     .example code {
-      color: #94a3b8;
-      background: #0f172a;
+      color: var(--code-color);
+      background: var(--code-bg);
       padding: 0.1em 0.3em;
       border-radius: 0.25rem;
     }
 
     .live-badge {
       display: inline-block;
-      background: #166534;
-      color: #4ade80;
+      background: var(--badge-bg);
+      color: var(--badge-color);
       font-size: 0.7rem;
       padding: 0.15rem 0.5rem;
       border-radius: 9999px;
@@ -120,18 +201,35 @@
       pointer-events: none;
       z-index: 0;
     }
-
-    .card {
-      position: relative;
-      z-index: 1;
-    }
   </style>
 </head>
 <body>
   <canvas id="hearts-canvas"></canvas>
-  <div class="card" id="card">Loading…</div>
+  <div class="card" id="card">
+    <button id="theme-toggle" title="Toggle dark/light mode">🌙</button>
+    Loading…
+  </div>
 
   <script>
+    // ── Theme toggle ───────────────────────────────────────────────────────
+    (function () {
+      const root   = document.documentElement;
+      const btn    = document.getElementById('theme-toggle');
+      const stored = localStorage.getItem('age-tracker-theme');
+      const theme  = stored || 'light';
+
+      root.setAttribute('data-theme', theme);
+      btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+
+      btn.addEventListener('click', function () {
+        const current = root.getAttribute('data-theme');
+        const next    = current === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        btn.textContent = next === 'dark' ? '☀️' : '🌙';
+        localStorage.setItem('age-tracker-theme', next);
+      });
+    })();
+
     function formatNumber(n) {
       return n.toLocaleString('en-US');
     }
@@ -143,8 +241,15 @@
 
       const card = document.getElementById('card');
 
+      // Keep the toggle button when re-rendering card contents
+      function setCardContent(html) {
+        const btn = document.getElementById('theme-toggle');
+        card.innerHTML = html;
+        card.prepend(btn);
+      }
+
       if (!name || !birth) {
-        card.innerHTML = `
+        setCardContent(`
           <h1>Age Tracker</h1>
           <p class="subtitle">Missing query parameters.</p>
           <div class="error">
@@ -153,18 +258,18 @@
               Example:<br>
               <code>?name=Alice&amp;birth=1990-06-15T12:00:00</code>
             </div>
-          </div>`;
+          </div>`);
         return;
       }
 
       const birthDate = new Date(birth);
       if (isNaN(birthDate.getTime())) {
-        card.innerHTML = `
+        setCardContent(`
           <h1>Age Tracker</h1>
           <div class="error">
             Invalid <strong>birth</strong> value. Use an ISO 8601 date/timestamp.<br>
             <div class="example">Example: <code>1990-06-15</code> or <code>1990-06-15T08:30:00</code></div>
-          </div>`;
+          </div>`);
         return;
       }
 
@@ -173,10 +278,10 @@
         const diffMs = now - birthDate;
 
         if (diffMs < 0) {
-          card.innerHTML = `
+          setCardContent(`
             <h1>${escHtml(name)}</h1>
             <p class="subtitle">Birth date is in the future.</p>
-            <div class="error">The provided birth timestamp has not occurred yet.</div>`;
+            <div class="error">The provided birth timestamp has not occurred yet.</div>`);
           return;
         }
 
@@ -193,7 +298,7 @@
         if (months < 0) { years--; months += 12; }
         const totalMonths = years * 12 + months;
 
-        card.innerHTML = `
+        setCardContent(`
           <h1>${escHtml(name)}<span class="live-badge">LIVE</span></h1>
           <p class="subtitle">Born ${birthDate.toLocaleString()}</p>
           <div class="grid">
@@ -203,7 +308,7 @@
             ${stat('Days',    totalDays,    'total full days')}
             ${stat('Hours',   totalHours,   'total full hours')}
             ${stat('Minutes', totalMinutes, 'total full minutes')}
-          </div>`;
+          </div>`);
       }
 
       update();
