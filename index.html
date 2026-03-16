@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Age Tracker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 1.5rem;
+      padding: 2.5rem 3rem;
+      max-width: 680px;
+      width: 100%;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 0.25rem;
+    }
+
+    .subtitle {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+
+    .stat {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 1rem;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #38bdf8;
+      line-height: 1;
+    }
+
+    .stat-unit {
+      font-size: 0.8rem;
+      color: #475569;
+    }
+
+    .error {
+      color: #f87171;
+      background: #1e1e2e;
+      border: 1px solid #7f1d1d;
+      border-radius: 0.75rem;
+      padding: 1rem 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .example {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #64748b;
+      word-break: break-all;
+    }
+
+    .example code {
+      color: #94a3b8;
+      background: #0f172a;
+      padding: 0.1em 0.3em;
+      border-radius: 0.25rem;
+    }
+
+    .live-badge {
+      display: inline-block;
+      background: #166534;
+      color: #4ade80;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 9999px;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">Loading…</div>
+
+  <script>
+    function formatNumber(n) {
+      return n.toLocaleString('en-US');
+    }
+
+    function render() {
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get('name');
+      const birth = params.get('birth'); // ISO timestamp or date string
+
+      const card = document.getElementById('card');
+
+      if (!name || !birth) {
+        card.innerHTML = `
+          <h1>Age Tracker</h1>
+          <p class="subtitle">Missing query parameters.</p>
+          <div class="error">
+            Please provide <strong>name</strong> and <strong>birth</strong> as URL query parameters.
+            <div class="example">
+              Example:<br>
+              <code>?name=Alice&amp;birth=1990-06-15T12:00:00</code>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const birthDate = new Date(birth);
+      if (isNaN(birthDate.getTime())) {
+        card.innerHTML = `
+          <h1>Age Tracker</h1>
+          <div class="error">
+            Invalid <strong>birth</strong> value. Use an ISO 8601 date/timestamp.<br>
+            <div class="example">Example: <code>1990-06-15</code> or <code>1990-06-15T08:30:00</code></div>
+          </div>`;
+        return;
+      }
+
+      function update() {
+        const now = new Date();
+        const diffMs = now - birthDate;
+
+        if (diffMs < 0) {
+          card.innerHTML = `
+            <h1>${escHtml(name)}</h1>
+            <p class="subtitle">Birth date is in the future.</p>
+            <div class="error">The provided birth timestamp has not occurred yet.</div>`;
+          return;
+        }
+
+        // --- full totals (all as integers) ---
+        const totalMinutes = Math.floor(diffMs / 60_000);
+        const totalHours   = Math.floor(diffMs / 3_600_000);
+        const totalDays    = Math.floor(diffMs / 86_400_000);
+        const totalWeeks   = Math.floor(totalDays / 7);
+
+        // Calendar-accurate months & years
+        let years  = now.getFullYear() - birthDate.getFullYear();
+        let months = now.getMonth()    - birthDate.getMonth();
+        if (now.getDate() < birthDate.getDate()) months--;
+        if (months < 0) { years--; months += 12; }
+        const totalMonths = years * 12 + months;
+
+        card.innerHTML = `
+          <h1>${escHtml(name)}<span class="live-badge">LIVE</span></h1>
+          <p class="subtitle">Born ${birthDate.toLocaleString()}</p>
+          <div class="grid">
+            ${stat('Years',   years,        'full calendar years')}
+            ${stat('Months',  totalMonths,  'total full months')}
+            ${stat('Weeks',   totalWeeks,   'total full weeks')}
+            ${stat('Days',    totalDays,    'total full days')}
+            ${stat('Hours',   totalHours,   'total full hours')}
+            ${stat('Minutes', totalMinutes, 'total full minutes')}
+          </div>`;
+      }
+
+      update();
+      setInterval(update, 60_000); // refresh every minute
+    }
+
+    function stat(label, value, unit) {
+      return `
+        <div class="stat">
+          <span class="stat-label">${label}</span>
+          <span class="stat-value">${formatNumber(value)}</span>
+          <span class="stat-unit">${unit}</span>
+        </div>`;
+    }
+
+    function escHtml(str) {
+      return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    render();
+  </script>
+</body>
+</html>
