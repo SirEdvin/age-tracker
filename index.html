@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,41 +7,110 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ── Tokens ─────────────────────────────────────────────────────────── */
+    :root {
+      --bg:         #fff5f7;
+      --bg-card:    #ffffff;
+      --bg-stat:    #fff0f4;
+      --border:     #fbc8d6;
+      --text:       #4a1028;
+      --text-sub:   #b06080;
+      --text-muted: #c490a4;
+      --accent:     #e8317a;
+      --shadow:     rgba(232, 49, 122, 0.12);
+      --badge-bg:   #fde8ef;
+      --badge-fg:   #c0185a;
+      --err-bg:     #fff0f4;
+      --err-border: #f9a8c9;
+      --err-fg:     #a01040;
+      --code-bg:    #fde8ef;
+      --toggle-bg:  #fbc8d6;
+      --toggle-icon: '🌙';
+    }
+
+    [data-theme="dark"] {
+      --bg:         #0f172a;
+      --bg-card:    #1e293b;
+      --bg-stat:    #0f172a;
+      --border:     #334155;
+      --text:       #f8fafc;
+      --text-sub:   #64748b;
+      --text-muted: #475569;
+      --accent:     #38bdf8;
+      --shadow:     rgba(0, 0, 0, 0.4);
+      --badge-bg:   #166534;
+      --badge-fg:   #4ade80;
+      --err-bg:     #1e1e2e;
+      --err-border: #7f1d1d;
+      --err-fg:     #f87171;
+      --code-bg:    #0f172a;
+      --toggle-bg:  #334155;
+      --toggle-icon: '☀️';
+    }
+
+    /* ── Base ────────────────────────────────────────────────────────────── */
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 2rem;
+      transition: background 0.3s, color 0.3s;
     }
 
+    /* ── Theme toggle ────────────────────────────────────────────────────── */
+    #theme-toggle {
+      position: fixed;
+      top: 1.25rem;
+      right: 1.25rem;
+      z-index: 10;
+      background: var(--toggle-bg);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      width: 2.5rem;
+      height: 2.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: background 0.3s, border-color 0.3s;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    #theme-toggle:hover { filter: brightness(0.95); }
+
+    /* ── Card ────────────────────────────────────────────────────────────── */
     .card {
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 1.5rem;
       padding: 2.5rem 3rem;
       max-width: 680px;
       width: 100%;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+      box-shadow: 0 25px 60px var(--shadow);
+      position: relative;
+      z-index: 1;
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
     }
 
     h1 {
       font-size: 1.6rem;
       font-weight: 700;
-      color: #f8fafc;
+      color: var(--text);
       margin-bottom: 0.25rem;
     }
 
     .subtitle {
-      color: #64748b;
+      color: var(--text-sub);
       font-size: 0.9rem;
       margin-bottom: 2rem;
     }
 
+    /* ── Stats grid ──────────────────────────────────────────────────────── */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -49,38 +118,40 @@
     }
 
     .stat {
-      background: #0f172a;
-      border: 1px solid #334155;
+      background: var(--bg-stat);
+      border: 1px solid var(--border);
       border-radius: 1rem;
       padding: 1.25rem 1.5rem;
       display: flex;
       flex-direction: column;
       gap: 0.3rem;
+      transition: background 0.3s, border-color 0.3s;
     }
 
     .stat-label {
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: #64748b;
+      color: var(--text-sub);
     }
 
     .stat-value {
       font-size: 2rem;
       font-weight: 700;
-      color: #38bdf8;
+      color: var(--accent);
       line-height: 1;
     }
 
     .stat-unit {
       font-size: 0.8rem;
-      color: #475569;
+      color: var(--text-muted);
     }
 
+    /* ── Misc ────────────────────────────────────────────────────────────── */
     .error {
-      color: #f87171;
-      background: #1e1e2e;
-      border: 1px solid #7f1d1d;
+      color: var(--err-fg);
+      background: var(--err-bg);
+      border: 1px solid var(--err-border);
       border-radius: 0.75rem;
       padding: 1rem 1.5rem;
       font-size: 0.95rem;
@@ -89,21 +160,21 @@
     .example {
       margin-top: 1rem;
       font-size: 0.8rem;
-      color: #64748b;
+      color: var(--text-sub);
       word-break: break-all;
     }
 
     .example code {
-      color: #94a3b8;
-      background: #0f172a;
+      color: var(--text);
+      background: var(--code-bg);
       padding: 0.1em 0.3em;
       border-radius: 0.25rem;
     }
 
     .live-badge {
       display: inline-block;
-      background: #166534;
-      color: #4ade80;
+      background: var(--badge-bg);
+      color: var(--badge-fg);
       font-size: 0.7rem;
       padding: 0.15rem 0.5rem;
       border-radius: 9999px;
@@ -111,7 +182,7 @@
       vertical-align: middle;
     }
 
-    /* Hearts */
+    /* ── Hearts canvas ───────────────────────────────────────────────────── */
     #hearts-canvas {
       position: fixed;
       inset: 0;
@@ -120,28 +191,37 @@
       pointer-events: none;
       z-index: 0;
     }
-
-    .card {
-      position: relative;
-      z-index: 1;
-    }
   </style>
 </head>
 <body>
+  <button id="theme-toggle" aria-label="Toggle dark/light mode">🌙</button>
   <canvas id="hearts-canvas"></canvas>
   <div class="card" id="card">Loading…</div>
 
   <script>
-    function formatNumber(n) {
-      return n.toLocaleString('en-US');
-    }
+    // ── Theme toggle ────────────────────────────────────────────────────────
+    const root   = document.documentElement;
+    const toggle = document.getElementById('theme-toggle');
+    const stored = localStorage.getItem('theme');
+    if (stored) root.setAttribute('data-theme', stored);
+
+    toggle.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      toggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+    // Set correct icon on load
+    toggle.textContent = root.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+
+    // ── Age logic ───────────────────────────────────────────────────────────
+    function formatNumber(n) { return n.toLocaleString('en-US'); }
 
     function render() {
       const params = new URLSearchParams(window.location.search);
-      const name = params.get('name');
-      const birth = params.get('birth'); // ISO timestamp or date string
-
-      const card = document.getElementById('card');
+      const name  = params.get('name');
+      const birth = params.get('birth');
+      const card  = document.getElementById('card');
 
       if (!name || !birth) {
         card.innerHTML = `
@@ -169,7 +249,7 @@
       }
 
       function update() {
-        const now = new Date();
+        const now    = new Date();
         const diffMs = now - birthDate;
 
         if (diffMs < 0) {
@@ -180,13 +260,11 @@
           return;
         }
 
-        // --- full totals (all as integers) ---
         const totalMinutes = Math.floor(diffMs / 60_000);
         const totalHours   = Math.floor(diffMs / 3_600_000);
         const totalDays    = Math.floor(diffMs / 86_400_000);
         const totalWeeks   = Math.floor(totalDays / 7);
 
-        // Calendar-accurate months & years
         let years  = now.getFullYear() - birthDate.getFullYear();
         let months = now.getMonth()    - birthDate.getMonth();
         if (now.getDate() < birthDate.getDate()) months--;
@@ -207,7 +285,7 @@
       }
 
       update();
-      setInterval(update, 60_000); // refresh every minute
+      setInterval(update, 60_000);
     }
 
     function stat(label, value, unit) {
@@ -225,11 +303,11 @@
 
     render();
 
-    // ── Hearts animation ──────────────────────────────────────────────────
+    // ── Hearts animation ────────────────────────────────────────────────────
     (function () {
       const canvas = document.getElementById('hearts-canvas');
-      const ctx = canvas.getContext('2d');
-      let hearts = [];
+      const ctx    = canvas.getContext('2d');
+      let hearts   = [];
 
       function resize() {
         canvas.width  = window.innerWidth;
@@ -238,34 +316,35 @@
       window.addEventListener('resize', resize);
       resize();
 
-      // Draw a heart centered at (0,0) with given size
       function heartPath(size) {
         ctx.beginPath();
         ctx.moveTo(0, -size * 0.3);
-        ctx.bezierCurveTo( size * 0.5, -size,  size,      -size * 0.3,  0,  size * 0.6);
+        ctx.bezierCurveTo( size * 0.5, -size,  size,       -size * 0.3, 0,  size * 0.6);
         ctx.bezierCurveTo(-size,       -size * 0.3, -size * 0.5, -size, 0, -size * 0.3);
         ctx.closePath();
       }
 
+      function heartOpacity() {
+        // In dark mode hearts are more visible; in light mode softer
+        return root.getAttribute('data-theme') === 'dark' ? 0.55 : 0.35;
+      }
+
       function spawnHeart() {
-        const size   = 10 + Math.random() * 18;          // 10–28 px
-        const x      = Math.random() * canvas.width;
-        const speed  = 0.4 + Math.random() * 0.7;        // px/frame
-        const drift  = (Math.random() - 0.5) * 0.6;     // gentle sway
-        const wobble = Math.random() * Math.PI * 2;      // phase offset
-        const hue    = 330 + Math.random() * 30;         // pinks & reds
         return {
-          x, y: canvas.height + size,
-          size, speed, drift, wobble,
-          hue, opacity: 0,
-          age: 0,
+          x:      Math.random() * canvas.width,
+          y:      canvas.height + 30,
+          size:   10 + Math.random() * 18,
+          speed:  0.4 + Math.random() * 0.7,
+          drift:  (Math.random() - 0.5) * 0.6,
+          wobble: Math.random() * Math.PI * 2,
+          hue:    330 + Math.random() * 30,
+          opacity: 0,
+          age:    0,
         };
       }
 
-      // Spawn interval: one new heart every 600 ms on average
       let spawnTimer = 0;
       const SPAWN_INTERVAL = 600;
-
       let last = performance.now();
 
       function frame(now) {
@@ -281,13 +360,13 @@
         }
 
         hearts = hearts.filter(h => h.y > -h.size * 2 && h.opacity >= 0);
+        const maxAlpha = heartOpacity();
 
         for (const h of hearts) {
-          h.age  += dt;
-          h.y    -= h.speed * (dt / 16);
-          h.x    += h.drift + Math.sin(h.age / 800 + h.wobble) * 0.3;
+          h.age += dt;
+          h.y   -= h.speed * (dt / 16);
+          h.x   += h.drift + Math.sin(h.age / 800 + h.wobble) * 0.3;
 
-          // Fade in over first 1 s, fade out in last 2 s of a ~6 s life
           const life = h.age / 6000;
           if (life < 0.15)      h.opacity = life / 0.15;
           else if (life > 0.65) h.opacity = 1 - (life - 0.65) / 0.35;
@@ -296,16 +375,14 @@
 
           ctx.save();
           ctx.translate(h.x, h.y);
-          // gentle rotation sway
           ctx.rotate(Math.sin(h.age / 1200 + h.wobble) * 0.15);
 
           heartPath(h.size);
-          ctx.fillStyle = `hsla(${h.hue}, 90%, 65%, ${h.opacity * 0.55})`;
+          ctx.fillStyle = `hsla(${h.hue}, 90%, 65%, ${h.opacity * maxAlpha})`;
           ctx.fill();
 
-          // soft inner glow
           heartPath(h.size * 0.6);
-          ctx.fillStyle = `hsla(${h.hue}, 100%, 85%, ${h.opacity * 0.35})`;
+          ctx.fillStyle = `hsla(${h.hue}, 100%, 85%, ${h.opacity * maxAlpha * 0.6})`;
           ctx.fill();
 
           ctx.restore();
